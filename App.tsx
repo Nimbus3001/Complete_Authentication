@@ -14,6 +14,8 @@ const AppContent: React.FC = () => {
     setStatusMessage({ text, type });
     if (text.includes('[SIMULATION]')) {
       setIsSimulation(true);
+    } else {
+      setIsSimulation(false);
     }
   };
 
@@ -39,7 +41,7 @@ const AppContent: React.FC = () => {
         </div>
       )}
 
-      {/* Header following the screenshot style */}
+      {/* Header following the aesthetic style */}
       <header className="mb-12 text-center relative z-10">
         <h1 className="text-3xl md:text-5xl font-bold neon-glow tracking-widest uppercase">
           Codemania Admin Portal
