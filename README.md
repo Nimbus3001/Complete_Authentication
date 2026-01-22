@@ -1,20 +1,17 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
 
-# Run and deploy your AI Studio app
+# Codemania Backend Setup
 
-This contains everything you need to run your app locally.
+To stop "Simulation Mode" and use the real auth logic, follow these steps:
 
-View your app in AI Studio: https://ai.studio/apps/drive/18nB-bV-cE_dDuQOT4ahwIKNYoVam0XSK
+1. **Install Node.js**: Ensure you have Node.js installed on your machine.
+2. **Install Dependencies**: Open your terminal in this project folder and run:
+   ```bash
+   npm install
+   ```
+3. **Start the Server**:
+   ```bash
+   npm start
+   ```
+4. **Connect**: Once the server is running at `http://localhost:3000`, refresh your frontend. It will now talk to this real server instead of using the LocalStorage fallback.
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+**Note**: This server uses an in-memory array for users. If you restart the server, all registered users will be cleared. For permanent storage, you would integrate a database like MongoDB.
