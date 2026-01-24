@@ -3,40 +3,97 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Codemania Auth</title>
+    <title>Codemania Auth Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+      :root {
+        --cyan: #00f5d4;
+        --yellow: #e9ff70;
+        --dark: #000a0a;
+        --dark-alt: #001212;
+      }
       body {
         font-family: 'JetBrains+Mono', monospace;
-        background-color: #000a0a;
-        color: #00f5d4;
+        background-color: var(--dark);
+        color: var(--cyan);
+        margin: 0;
+        overflow: hidden;
+        height: 100vh;
+      }
+      .crt::after {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        z-index: 100;
+        background-size: 100% 2px, 3px 100%;
+        pointer-events: none;
+      }
+      .grid-bg {
+        background-image: linear-gradient(rgba(0, 245, 212, 0.05) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(0, 245, 212, 0.05) 1px, transparent 1px);
+        background-size: 30px 30px;
+        perspective: 500px;
       }
       .neon-glow {
         text-shadow: 0 0 10px rgba(0, 245, 212, 0.8), 0 0 20px rgba(0, 245, 212, 0.4);
       }
       .neon-border {
-        border-color: #00f5d4;
-        box-shadow: 0 0 10px rgba(0, 245, 212, 0.3), inset 0 0 5px rgba(0, 245, 212, 0.2);
+        border: 1px solid var(--cyan);
+        box-shadow: 0 0 15px rgba(0, 245, 212, 0.2), inset 0 0 10px rgba(0, 245, 212, 0.1);
+        position: relative;
       }
+      .neon-border::before, .neon-border::after {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border: 2px solid var(--yellow);
+      }
+      .neon-border::before { top: -2px; left: -2px; border-right: 0; border-bottom: 0; }
+      .neon-border::after { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+      
       .neon-button {
-        background-color: #00f5d4;
+        background-color: var(--cyan);
         color: #000;
         box-shadow: 0 0 15px rgba(0, 245, 212, 0.6);
-        transition: all 0.2s ease-in-out;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
       }
-      .neon-button:hover {
-        box-shadow: 0 0 25px rgba(0, 245, 212, 0.9);
-        transform: scale(1.02);
+      .neon-button:hover:not(:disabled) {
+        box-shadow: 0 0 25px rgba(0, 245, 212, 1);
+        transform: translateY(-2px);
       }
-      .yellow-text {
-        color: #e9ff70;
+      .neon-button:active:not(:disabled) {
+        transform: translateY(0);
       }
-      .yellow-glow {
-        text-shadow: 0 0 8px rgba(233, 255, 112, 0.5);
+      .yellow-text { color: var(--yellow); }
+      .yellow-glow { text-shadow: 0 0 8px rgba(233, 255, 112, 0.5); }
+      
+      @keyframes scan {
+        from { top: -100%; }
+        to { top: 100%; }
       }
+      .scanline {
+        width: 100%;
+        height: 100px;
+        z-index: 101;
+        background: linear-gradient(0deg, rgba(0, 245, 212, 0) 0%, rgba(0, 245, 212, 0.1) 50%, rgba(0, 245, 212, 0) 100%);
+        opacity: 0.1;
+        position: absolute;
+        bottom: 100%;
+        animation: scan 4s linear infinite;
+        pointer-events: none;
+      }
+      input::placeholder { color: rgba(0, 245, 212, 0.3); }
     </style>
   <script type="importmap">
 {
@@ -51,8 +108,10 @@
 }
 </script>
 </head>
-  <body class="min-h-screen">
+  <body class="crt">
+    <div class="grid-bg absolute inset-0 opacity-20"></div>
+    <div class="scanline"></div>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="index.tsx"></script>
   </body>
 </html>

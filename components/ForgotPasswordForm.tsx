@@ -1,19 +1,16 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { resetPassword } from '../services/api';
+import { resetPassword } from '../services/api.ts';
 
-interface ForgotPasswordFormProps {
-  onStatus: (text: string, type: 'success' | 'error' | 'neutral') => void;
-}
+const h = React.createElement;
 
-const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onStatus }) => {
-  const [name, setName] = useState('');
+const ForgotPasswordForm = ({ onStatus }) => {
+  const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name) {
+    if (!username) {
       onStatus('Identity identifier required', 'error');
       return;
     }
@@ -22,7 +19,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onStatus }) => 
     onStatus('Searching mainframe...', 'neutral');
     
     try {
-      const response = await resetPassword(name);
+      const response = await resetPassword(username);
       if (response.success) {
         onStatus(response.message, 'success');
       } else {
@@ -35,43 +32,32 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onStatus }) => 
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <p className="text-xs text-[#00f5d4]/80 uppercase tracking-tighter leading-relaxed">
-        Lost access keys? Enter your Identity ID to initiate remote recovery. A secure transmission will be dispatched to your linked neural uplink.
-      </p>
-
-      <div className="space-y-2">
-        <label className="block yellow-text text-sm uppercase font-bold tracking-widest">
-          User ID
-        </label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full bg-[#001a1a] border-b-2 border-[#00f5d4] p-3 text-[#00f5d4] focus:outline-none focus:bg-[#002a2a] transition-all"
-          placeholder="USER_NAME"
-          autoComplete="username"
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={isLoading}
-        className={`w-full py-4 mt-4 font-bold uppercase tracking-widest neon-button ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-      >
-        {isLoading ? 'TRANSMITTING...' : 'INITIATE RECOVERY'}
-      </button>
-
-      <div className="pt-4 text-center">
-        <Link
-          to="/login"
-          className="text-xs yellow-text uppercase tracking-widest hover:underline opacity-80"
-        >
-          [ Return To Authentication ]
-        </Link>
-      </div>
-    </form>
+  return h('form', { onSubmit: handleSubmit, className: "space-y-6" },
+    h('p', { className: "text-xs text-[#00f5d4]/80 uppercase tracking-tighter leading-relaxed" },
+      "Lost access keys? Enter your Username to initiate remote recovery. A secure transmission will be dispatched to your linked neural uplink."
+    ),
+    h('div', { className: "space-y-2" },
+      h('label', { className: "block yellow-text text-sm uppercase font-bold tracking-widest" }, "Username"),
+      h('input', {
+        type: "text",
+        value: username,
+        onChange: (e) => setUsername(e.target.value),
+        className: "w-full bg-[#001a1a] border-b-2 border-[#00f5d4] p-3 text-[#00f5d4] focus:outline-none focus:bg-[#002a2a] transition-all",
+        placeholder: "USER_NAME",
+        autoComplete: "username"
+      })
+    ),
+    h('button', {
+      type: "submit",
+      disabled: isLoading,
+      className: `w-full py-4 mt-4 font-bold uppercase tracking-widest neon-button ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`
+    }, isLoading ? 'TRANSMITTING...' : 'INITIATE RECOVERY'),
+    h('div', { className: "pt-4 text-center" },
+      h(Link, {
+        to: "/login",
+        className: "text-xs yellow-text uppercase tracking-widest hover:underline opacity-80"
+      }, "[ Return To Authentication ]")
+    )
   );
 };
 

@@ -1,120 +1,112 @@
-
-import { AuthResponse } from '../types';
-
-/**
- * Note: Since the provided backend is a local server running on port 3000,
- * we attempt to fetch from localhost:3000. 
- * 
- * FIX: Added a fallback to localStorage simulation if the server is unreachable.
- * This prevents the "Failed to fetch" error from breaking the user experience.
- */
-const API_BASE_URL = 'http://localhost:3000';
-
-// Simple local storage keys for the simulation
+// API Base path alignment with app.js backend
+const API_BASE_URL = 'http://localhost:5000/api/auth/admin';
 const STORAGE_KEY = 'codemania_mock_users';
+const TOKEN_KEY = 'codemania_auth_token';
 
-interface MockUser {
-  name: string;
-  password: string; // In a real app, never store plain text passwords
-}
-
-const getMockUsers = (): MockUser[] => {
-  const users = localStorage.getItem(STORAGE_KEY);
-  return users ? JSON.parse(users) : [];
-};
-
-const saveMockUser = (user: MockUser) => {
-  const users = getMockUsers();
-  users.push(user);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-};
-
-export const loginUser = async (name: string, password: string): Promise<AuthResponse> => {
+const getMockUsers = () => {
+  const usersJson = localStorage.getItem(STORAGE_KEY);
+  if (!usersJson) return [];
   try {
-    const response = await fetch(`${API_BASE_URL}/users/login`, {
+    return JSON.parse(usersJson);
+  } catch (e) {
+    return [];
+  }
+};
+
+const saveMockUser = (user) => {
+  const usersList = getMockUsers();
+  usersList.push(user);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(usersList));
+};
+
+export const loginUser = async (username, password) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, password }),
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ username, password }),
     });
 
-    const text = await response.text();
+    const data = await response.json();
 
-    if (response.ok) {
-      if (text === 'Success') {
-        return { success: true, message: 'ACCESS GRANTED: WELCOME ' + name.toUpperCase(), status: response.status };
-      } else if (text === 'Not Allowed') {
-        return { success: false, message: 'Invalid credentials', status: response.status };
-      }
-    }
-    
-    return { success: false, message: text || 'Login failed', status: response.status };
-  } catch (error) {
-    console.warn('Backend unreachable, switching to simulation mode:', error);
-    
-    // Fallback Simulation Logic
-    const users = getMockUsers();
-    const user = users.find(u => u.name === name && u.password === password);
-    
-    if (user) {
+    if (response.ok && data.token) {
+      localStorage.setItem(TOKEN_KEY, data.token);
       return { 
         success: true, 
-        message: '[SIMULATION] ACCESS GRANTED: WELCOME ' + name.toUpperCase(), 
-        status: 200 
+        message: `UPLINK_STABLE: ACCESS_GRANTED_${username.toUpperCase()}`, 
+        status: response.status,
+        token: data.token
       };
     }
     
     return { 
       success: false, 
-      message: 'SIMULATION: Identity not found or incorrect key', 
+      message: data.message || 'UNAUTHORIZED_ACCESS', 
+      status: response.status 
+    };
+  } catch (error) {
+    const users = getMockUsers();
+    const foundUser = users.find(u => u.username === username && u.password === password);
+    
+    await new Promise(resolve => setTimeout(resolve, 600));
+
+    if (foundUser) {
+      const mockToken = `sim_jwt_${Math.random().toString(36).substr(2, 12)}`;
+      localStorage.setItem(TOKEN_KEY, mockToken);
+      return { 
+        success: true, 
+        message: 'SIMULATION_OVERRIDE: IDENTITY_VERIFIED', 
+        status: 200,
+        token: mockToken
+      };
+    }
+    
+    return { 
+      success: false, 
+      message: 'SIMULATION_ERROR: IDENTITY_NOT_FOUND', 
       status: 401 
     };
   }
 };
 
-export const registerUser = async (name: string, password: string): Promise<AuthResponse> => {
+export const registerUser = async (username, password) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/users`, {
+    const response = await fetch(`${API_BASE_URL}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, password }),
+      body: JSON.stringify({ username, password }),
     });
 
-    if (response.status === 201) {
-      return { success: true, message: 'ID CREATED SUCCESSFULLY. PLEASE LOGIN.', status: response.status };
+    const data = await response.json();
+
+    if (response.ok) {
+      return { success: true, message: 'IDENTITY_RECORDED. AWAITING_HANDSHAKE.', status: response.status };
     }
     
-    const text = await response.text();
-    return { success: false, message: text || 'Failed to create user', status: response.status };
+    return { success: false, message: data.message || 'REGISTRATION_FAILURE', status: response.status };
   } catch (error) {
-    console.warn('Backend unreachable, switching to simulation mode:', error);
-
-    // Fallback Simulation Logic
     const users = getMockUsers();
-    if (users.some(u => u.name === name)) {
-      return { success: false, message: 'SIMULATION: ID already exists', status: 400 };
+    if (users.some(u => u.username === username)) {
+      return { success: false, message: 'SIMULATION_ERROR: HANDLE_RESERVED', status: 400 };
     }
 
-    saveMockUser({ name, password });
+    saveMockUser({ username, password });
     return { 
       success: true, 
-      message: '[SIMULATION] IDENTITY REGISTERED IN LOCAL STORAGE', 
+      message: 'SIMULATION: IDENTITY_STORED', 
       status: 201 
     };
   }
 };
 
-/**
- * Simulated password reset. 
- * Since the original backend doesn't have this, we simulate it.
- */
-export const resetPassword = async (name: string): Promise<AuthResponse> => {
-  // Artificial delay for realism
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Simulation: Always succeed if name is provided
+export const resetPassword = async (username) => {
+  await new Promise(resolve => setTimeout(resolve, 1000));
   return {
     success: true,
-    message: '[SIMULATION] RECOVERY PACKET SENT TO ' + name.toUpperCase(),
+    message: `RECOVERY_SIGNAL: ${username.toUpperCase()}`,
     status: 200
   };
 };

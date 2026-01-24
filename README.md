@@ -18,14 +18,14 @@ npm install
 ```
 
 ### 3. Start the Backend (Terminal 1)
-This process handles the encrypted user database and authentication logic.
+This process handles the encrypted user database and JWT authentication logic.
 ```bash
 npm run start:backend
 ```
-*The server will start on `http://localhost:3000`.*
+*The server will start on `http://localhost:5000`.*
 
 ### 4. Start the Frontend (Terminal 2)
-Open a **new** terminal window (keep the first one running) and start the development server:
+Open a **new** terminal window and start the development server:
 ```bash
 npm run dev
 ```
@@ -35,19 +35,13 @@ npm run dev
 
 ## 🛠️ System Architecture
 
-- **Frontend**: React 19, Vite, Tailwind CSS, Lucide Icons.
-- **Backend**: Node.js, Express, BcryptJS (for password hashing), CORS.
-- **Security**: Passwords are never stored in plain text. They are salted and hashed before being saved to the mainframe.
+- **Frontend**: React 19, Vite, Tailwind CSS.
+- **Backend**: Node.js, Express, BcryptJS, JSON Web Token (JWT).
+- **Security**: Passwords are hashed. Tokens are issued on successful login and stored in `localStorage`.
 
 ### 🧩 Simulation Mode
 If the frontend cannot reach the backend (e.g., if Terminal 1 isn't running), it will automatically switch to **Simulation Mode**.
-- In this mode, users are stored in your browser's `LocalStorage`.
-- A yellow warning banner will appear at the top of the portal.
-- Once the backend is detected, the portal will switch to the real Express server.
-
-## ⚠️ Important Notes
-- **Data Persistence**: This version uses an in-memory array for the backend. Restarting the backend server will wipe all registered users. 
-- **Production**: For a production environment, connect `server.js` to a database like MongoDB or PostgreSQL.
+- In this mode, users and tokens are managed via the browser's `LocalStorage`.
 
 ---
 **CODEMANIA_OS // SECURITY_LEVEL_04**

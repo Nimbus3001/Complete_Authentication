@@ -1,18 +1,54 @@
+import React, { useState, useEffect } from 'react';
+import { HashRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import LoginForm from './components/LoginForm.tsx';
+import RegisterForm from './components/RegisterForm.tsx';
+import ForgotPasswordForm from './components/ForgotPasswordForm.tsx';
 
-import React, { useState } from 'react';
-import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import LoginForm from './components/LoginForm';
-import RegisterForm from './components/RegisterForm';
-import ForgotPasswordForm from './components/ForgotPasswordForm';
+const h = React.createElement;
 
-const AppContent: React.FC = () => {
-  const [statusMessage, setStatusMessage] = useState<{ text: string; type: 'success' | 'error' | 'neutral' } | null>(null);
+const Dashboard = () => {
+  const navigate = useNavigate();
+  const token = localStorage.getItem('codemania_auth_token');
+
+  useEffect(() => {
+    if (!token) {
+      navigate('/login');
+    }
+  }, [token, navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('codemania_auth_token');
+    navigate('/login');
+  };
+
+  if (!token) return null;
+
+  return h('div', { className: "space-y-6 text-center" },
+    h('div', { className: "p-6 border border-[#00f5d4]/30 bg-[#001a1a]/40 rounded" },
+      h('h2', { className: "text-2xl font-bold yellow-text neon-glow mb-4 uppercase italic" }, "ACCESS_UNLOCKED"),
+      h('p', { className: "text-xs opacity-80 leading-relaxed mb-6" },
+        "Welcome, Operator. All neural systems are synchronized. Your terminal is now connected to the primary mainframe."
+      ),
+      h('div', { className: "grid grid-cols-2 gap-4 text-[10px] uppercase tracking-widest text-left mb-8" },
+        h('div', { className: "p-2 bg-black/40 border-l-2 border-[#00f5d4]" }, "Uptime: 99.99%"),
+        h('div', { className: "p-2 bg-black/40 border-l-2 border-[#e9ff70]" }, "Latency: 14ms")
+      ),
+      h('button', { 
+        onClick: handleLogout,
+        className: "w-full py-3 bg-red-500/20 border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
+      }, "TERMINATE_SESSION")
+    )
+  );
+};
+
+const AppContent = () => {
+  const [statusMessage, setStatusMessage] = useState(null);
   const [isSimulation, setIsSimulation] = useState(false);
   const location = useLocation();
 
-  const handleStatus = (text: string, type: 'success' | 'error' | 'neutral') => {
+  const handleStatus = (text, type) => {
     setStatusMessage({ text, type });
-    if (text.includes('[SIMULATION]')) {
+    if (text && text.includes('SIMULATION')) {
       setIsSimulation(true);
     } else {
       setIsSimulation(false);
@@ -20,74 +56,58 @@ const AppContent: React.FC = () => {
   };
 
   const getPageTitle = () => {
-    switch (location.pathname) {
-      case '/register': return 'New Identity Registration';
-      case '/forgot-password': return 'Recovery Protocol';
-      default: return 'System Authentication';
-    }
+    const path = location.pathname;
+    if (path === '/register') return 'IDENTITY_GENERATION_PROTOCOL';
+    if (path === '/forgot-password') return 'ENCRYPTION_RECOVERY';
+    if (path === '/dashboard') return 'MAINFRAME_ACCESS';
+    return 'SECURE_UPLINK_ESTABLISHED';
   };
 
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[#000a0a] relative overflow-hidden">
-      {/* Background Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#00f5d4] rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#e9ff70] rounded-full blur-[120px]"></div>
-      </div>
-
-      {isSimulation && (
-        <div className="absolute top-0 w-full bg-[#e9ff70] text-[#000] text-[10px] py-1 text-center font-bold tracking-[0.3em] uppercase z-50">
-          Running in Simulation Mode: Backend (localhost:3000) is unreachable
-        </div>
-      )}
-
-      {/* Header following the aesthetic style */}
-      <header className="mb-12 text-center relative z-10">
-        <h1 className="text-3xl md:text-5xl font-bold neon-glow tracking-widest uppercase">
-          Codemania Admin Portal
-        </h1>
-        <div className="h-1 w-full mt-4 bg-gradient-to-r from-transparent via-[#00f5d4] to-transparent shadow-[0_0_10px_#00f5d4]"></div>
-      </header>
-
-      <main className="w-full max-w-md relative z-10">
-        <div className="mb-6 flex flex-col gap-2">
-           <h2 className="text-xl yellow-text uppercase tracking-wider font-bold yellow-glow">
-            {getPageTitle()}
-          </h2>
-        </div>
-
-        <div className="bg-[#001212]/90 border-2 neon-border rounded-md p-8 backdrop-blur-md shadow-[0_0_30px_rgba(0,245,212,0.1)]">
-          <Routes>
-            <Route path="/login" element={<LoginForm onStatus={handleStatus} />} />
-            <Route path="/register" element={<RegisterForm onStatus={handleStatus} />} />
-            <Route path="/forgot-password" element={<ForgotPasswordForm onStatus={handleStatus} />} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </Routes>
-        </div>
-
-        {statusMessage && (
-          <div className={`mt-6 p-4 text-center border font-bold uppercase tracking-tighter transition-all animate-pulse ${
-            statusMessage.type === 'success' ? 'border-[#00f5d4] text-[#00f5d4] bg-[#00f5d4]/10' : 
-            statusMessage.type === 'error' ? 'border-red-500 text-red-500 bg-red-500/10' : 
-            'border-[#e9ff70] text-[#e9ff70] bg-[#e9ff70]/10'
-          }`}>
-            <span className="mr-2">&gt;&gt;</span>
-            {statusMessage.text}
-          </div>
-        )}
-
-        <footer className="mt-12 text-center opacity-40 text-xs uppercase tracking-[0.2em] yellow-text">
-          &copy; 2025 CODEMANIA_OS // SECURITY_LEVEL_04
-        </footer>
-      </main>
-    </div>
+  return h('div', { className: "min-h-screen flex flex-col items-center justify-center p-4 relative z-10" },
+    isSimulation && h('div', { className: "fixed top-0 w-full bg-[#e9ff70] text-[#000] text-[10px] py-1 text-center font-bold tracking-[0.3em] uppercase z-50 shadow-[0_0_20px_#e9ff70]" },
+      "OFFLINE_OVERRIDE_ACTIVE // LOCAL_STORAGE_EMULATION"
+    ),
+    h('header', { className: "mb-10 text-center relative" },
+      h('div', { className: "absolute -top-10 left-1/2 -translate-x-1/2 opacity-20 pointer-events-none whitespace-nowrap overflow-hidden" },
+        h('span', { className: "text-8xl font-black text-[#00f5d4]" }, "CODEMANIA")
+      ),
+      h('h1', { className: "text-4xl md:text-6xl font-bold neon-glow tracking-tighter uppercase italic" },
+        "CODE", h('span', { className: "yellow-text" }, "MANIA")
+      )
+    ),
+    h('main', { className: "w-full max-w-md" },
+      h('div', { className: "mb-3 flex justify-between items-end px-1" },
+        h('h2', { className: "text-[10px] yellow-text uppercase tracking-[0.2em] font-bold yellow-glow" }, getPageTitle()),
+        h('span', { className: "text-[8px] opacity-40 font-mono" }, "NODE_ID: 0x7F2A")
+      ),
+      h('div', { className: "bg-[#001212]/90 neon-border rounded-sm p-8 backdrop-blur-xl" },
+        h(Routes, null,
+          h(Route, { path: "/login", element: h(LoginForm, { onStatus: handleStatus }) }),
+          h(Route, { path: "/register", element: h(RegisterForm, { onStatus: handleStatus }) }),
+          h(Route, { path: "/forgot-password", element: h(ForgotPasswordForm, { onStatus: handleStatus }) }),
+          h(Route, { path: "/dashboard", element: h(Dashboard, null) }),
+          h(Route, { path: "*", element: h(Navigate, { to: "/login", replace: true }) })
+        )
+      ),
+      h('div', { className: "min-h-[60px]" },
+        statusMessage && h('div', { 
+          className: `mt-6 p-4 text-[10px] text-center border-l-4 font-bold uppercase tracking-widest transition-all duration-300 ${
+            statusMessage.type === 'success' ? 'border-[#00f5d4] text-[#00f5d4] bg-[#00f5d4]/5' : 
+            statusMessage.type === 'error' ? 'border-red-500 text-red-500 bg-red-500/5' : 
+            'border-[#e9ff70] text-[#e9ff70] bg-[#e9ff70]/5'
+          }`
+        }, statusMessage.text)
+      ),
+      h('footer', { className: "mt-12 flex justify-between items-center opacity-30 text-[8px] uppercase tracking-[0.2em]" },
+        h('span', null, "© 2025 CODEMANIA_CORP"),
+        h('span', null, "SECURED_BY_BEYOND_QUANTUM")
+      )
+    )
   );
 };
 
-const App: React.FC = () => (
-  <HashRouter>
-    <AppContent />
-  </HashRouter>
-);
+const App = () => {
+  return h(HashRouter, null, h(AppContent, null));
+};
 
 export default App;

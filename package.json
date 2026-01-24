@@ -1,11 +1,10 @@
-
 {
   "name": "codemania-portal",
   "version": "1.0.0",
   "description": "Cyberpunk Auth Portal with Node.js Backend",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
-    "start:backend": "node server.js",
+    "start:backend": "node app.js",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
@@ -13,10 +12,11 @@
   "dependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^6.22.3",
+    "react-router-dom": "^7.1.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
