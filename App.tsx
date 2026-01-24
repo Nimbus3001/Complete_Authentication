@@ -25,18 +25,18 @@ const Dashboard = () => {
 
   return h('div', { className: "space-y-6 text-center" },
     h('div', { className: "p-6 border border-[#00f5d4]/30 bg-[#001a1a]/40 rounded" },
-      h('h2', { className: "text-2xl font-bold yellow-text neon-glow mb-4 uppercase italic" }, "ACCESS_UNLOCKED"),
+      h('h2', { className: "text-2xl font-bold yellow-text neon-glow mb-4 uppercase italic" }, "ACCESS GRANTED"),
       h('p', { className: "text-xs opacity-80 leading-relaxed mb-6" },
-        "Welcome, Operator. All neural systems are synchronized. Your terminal is now connected to the primary mainframe."
+        "Welcome back, Administrator. You are now logged into the Codemania secure portal."
       ),
       h('div', { className: "grid grid-cols-2 gap-4 text-[10px] uppercase tracking-widest text-left mb-8" },
-        h('div', { className: "p-2 bg-black/40 border-l-2 border-[#00f5d4]" }, "Uptime: 99.99%"),
-        h('div', { className: "p-2 bg-black/40 border-l-2 border-[#e9ff70]" }, "Latency: 14ms")
+        h('div', { className: "p-2 bg-black/40 border-l-2 border-[#00f5d4]" }, "Status: Online"),
+        h('div', { className: "p-2 bg-black/40 border-l-2 border-[#e9ff70]" }, "Secure: Yes")
       ),
       h('button', { 
         onClick: handleLogout,
         className: "w-full py-3 bg-red-500/20 border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
-      }, "TERMINATE_SESSION")
+      }, "Log Out")
     )
   );
 };
@@ -48,7 +48,7 @@ const AppContent = () => {
 
   const handleStatus = (text, type) => {
     setStatusMessage({ text, type });
-    if (text && text.includes('SIMULATION')) {
+    if (text && text.includes('OFFLINE')) {
       setIsSimulation(true);
     } else {
       setIsSimulation(false);
@@ -57,15 +57,15 @@ const AppContent = () => {
 
   const getPageTitle = () => {
     const path = location.pathname;
-    if (path === '/register') return 'IDENTITY_GENERATION_PROTOCOL';
-    if (path === '/forgot-password') return 'ENCRYPTION_RECOVERY';
-    if (path === '/dashboard') return 'MAINFRAME_ACCESS';
-    return 'SECURE_UPLINK_ESTABLISHED';
+    if (path === '/register') return 'User Registration';
+    if (path === '/forgot-password') return 'Reset Password';
+    if (path === '/dashboard') return 'Admin Dashboard';
+    return 'Secure Portal Login';
   };
 
   return h('div', { className: "min-h-screen flex flex-col items-center justify-center p-4 relative z-10" },
     isSimulation && h('div', { className: "fixed top-0 w-full bg-[#e9ff70] text-[#000] text-[10px] py-1 text-center font-bold tracking-[0.3em] uppercase z-50 shadow-[0_0_20px_#e9ff70]" },
-      "OFFLINE_OVERRIDE_ACTIVE // LOCAL_STORAGE_EMULATION"
+      "RUNNING IN OFFLINE SIMULATION MODE"
     ),
     h('header', { className: "mb-10 text-center relative" },
       h('div', { className: "absolute -top-10 left-1/2 -translate-x-1/2 opacity-20 pointer-events-none whitespace-nowrap overflow-hidden" },
@@ -78,7 +78,7 @@ const AppContent = () => {
     h('main', { className: "w-full max-w-md" },
       h('div', { className: "mb-3 flex justify-between items-end px-1" },
         h('h2', { className: "text-[10px] yellow-text uppercase tracking-[0.2em] font-bold yellow-glow" }, getPageTitle()),
-        h('span', { className: "text-[8px] opacity-40 font-mono" }, "NODE_ID: 0x7F2A")
+        h('span', { className: "text-[8px] opacity-40 font-mono" }, "ID: 0x7F2A")
       ),
       h('div', { className: "bg-[#001212]/90 neon-border rounded-sm p-8 backdrop-blur-xl" },
         h(Routes, null,
@@ -99,8 +99,8 @@ const AppContent = () => {
         }, statusMessage.text)
       ),
       h('footer', { className: "mt-12 flex justify-between items-center opacity-30 text-[8px] uppercase tracking-[0.2em]" },
-        h('span', null, "© 2025 CODEMANIA_CORP"),
-        h('span', null, "SECURED_BY_BEYOND_QUANTUM")
+        h('span', null, "© 2025 CODEMANIA CORP"),
+        h('span', null, "SECURE TERMINAL")
       )
     )
   );

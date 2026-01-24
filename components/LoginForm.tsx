@@ -13,23 +13,23 @@ const LoginForm = ({ onStatus }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username || !password) {
-      onStatus('CREDENTIALS_REQUIRED', 'error');
+      onStatus('Username and password required', 'error');
       return;
     }
 
     setIsLoading(true);
-    onStatus('INITIATING_HANDSHAKE...', 'neutral');
+    onStatus('Authenticating...', 'neutral');
     
     try {
       const response = await loginUser(username, password);
       if (response.success) {
-        onStatus(response.message, 'success');
+        onStatus('Login successful', 'success');
         setTimeout(() => navigate('/dashboard'), 1000);
       } else {
         onStatus(response.message, 'error');
       }
     } catch (err) {
-      onStatus('TERMINAL_TIMEOUT: CONNECTION_LOST', 'error');
+      onStatus('Connection error', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -38,7 +38,7 @@ const LoginForm = ({ onStatus }) => {
   return h('form', { onSubmit: handleSubmit, className: "space-y-6" },
     h('div', { className: "space-y-2 group" },
       h('label', { className: "flex justify-between yellow-text text-[10px] uppercase font-bold tracking-widest opacity-80 group-focus-within:opacity-100 transition-opacity" },
-        h('span', null, "IDENTITY_HANDLE"),
+        h('span', null, "Username"),
         h('span', { className: "opacity-40" }, "01")
       ),
       h('div', { className: "relative" },
@@ -47,14 +47,14 @@ const LoginForm = ({ onStatus }) => {
           value: username,
           onChange: (e) => setUsername(e.target.value),
           className: "w-full bg-[#001a1a]/50 border-b-2 border-[#00f5d4]/30 p-4 text-[#00f5d4] focus:outline-none focus:border-[#00f5d4] focus:bg-[#002a2a]/50 transition-all font-mono text-sm",
-          placeholder: "USER_NAME",
+          placeholder: "Enter username",
           autoComplete: "username"
         })
       )
     ),
     h('div', { className: "space-y-2 group" },
       h('label', { className: "flex justify-between yellow-text text-[10px] uppercase font-bold tracking-widest opacity-80 group-focus-within:opacity-100 transition-opacity" },
-        h('span', null, "ENCRYPTION_KEY"),
+        h('span', null, "Password"),
         h('span', { className: "opacity-40" }, "02")
       ),
       h('div', { className: "relative" },
@@ -63,7 +63,7 @@ const LoginForm = ({ onStatus }) => {
           value: password,
           onChange: (e) => setPassword(e.target.value),
           className: "w-full bg-[#001a1a]/50 border-b-2 border-[#00f5d4]/30 p-4 text-[#00f5d4] focus:outline-none focus:border-[#00f5d4] focus:bg-[#002a2a]/50 transition-all font-mono text-sm",
-          placeholder: "••••••••",
+          placeholder: "Enter password",
           autoComplete: "current-password"
         })
       )
@@ -73,16 +73,16 @@ const LoginForm = ({ onStatus }) => {
         type: "submit",
         disabled: isLoading,
         className: `w-full py-5 font-bold uppercase tracking-[0.3em] neon-button text-xs ${isLoading ? 'opacity-50 cursor-wait' : ''}`
-      }, isLoading ? 'DECRYPTING_UPLINK...' : 'AUTHORIZE_ACCESS'),
+      }, isLoading ? 'Verifying...' : 'Login'),
       h('div', { className: "flex flex-col gap-3" },
         h(Link, {
           to: "/forgot-password",
           className: "text-[9px] yellow-text uppercase tracking-[0.2em] hover:text-white transition-colors flex items-center gap-2"
-        }, h('span', { className: "opacity-40" }, ">"), " RECOVER_LOST_IDENTITY"),
+        }, h('span', { className: "opacity-40" }, ">"), " Forgot Password?"),
         h(Link, {
           to: "/register",
           className: "text-[9px] yellow-text uppercase tracking-[0.2em] hover:text-white transition-colors flex items-center gap-2"
-        }, h('span', { className: "opacity-40" }, ">"), " GENERATE_NEW_PROTOCOL")
+        }, h('span', { className: "opacity-40" }, ">"), " Create New Account")
       )
     )
   );

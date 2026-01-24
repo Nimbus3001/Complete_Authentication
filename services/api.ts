@@ -36,7 +36,7 @@ export const loginUser = async (username, password) => {
       localStorage.setItem(TOKEN_KEY, data.token);
       return { 
         success: true, 
-        message: `UPLINK_STABLE: ACCESS_GRANTED_${username.toUpperCase()}`, 
+        message: 'Login successful', 
         status: response.status,
         token: data.token
       };
@@ -44,7 +44,7 @@ export const loginUser = async (username, password) => {
     
     return { 
       success: false, 
-      message: data.message || 'UNAUTHORIZED_ACCESS', 
+      message: data.message || 'Invalid username or password', 
       status: response.status 
     };
   } catch (error) {
@@ -58,7 +58,7 @@ export const loginUser = async (username, password) => {
       localStorage.setItem(TOKEN_KEY, mockToken);
       return { 
         success: true, 
-        message: 'SIMULATION_OVERRIDE: IDENTITY_VERIFIED', 
+        message: 'Offline Mode: Login Successful', 
         status: 200,
         token: mockToken
       };
@@ -66,7 +66,7 @@ export const loginUser = async (username, password) => {
     
     return { 
       success: false, 
-      message: 'SIMULATION_ERROR: IDENTITY_NOT_FOUND', 
+      message: 'Offline Mode: User not found', 
       status: 401 
     };
   }
@@ -83,20 +83,20 @@ export const registerUser = async (username, password) => {
     const data = await response.json();
 
     if (response.ok) {
-      return { success: true, message: 'IDENTITY_RECORDED. AWAITING_HANDSHAKE.', status: response.status };
+      return { success: true, message: 'Registration successful', status: response.status };
     }
     
-    return { success: false, message: data.message || 'REGISTRATION_FAILURE', status: response.status };
+    return { success: false, message: data.message || 'Registration failed', status: response.status };
   } catch (error) {
     const users = getMockUsers();
     if (users.some(u => u.username === username)) {
-      return { success: false, message: 'SIMULATION_ERROR: HANDLE_RESERVED', status: 400 };
+      return { success: false, message: 'Offline Mode: Username taken', status: 400 };
     }
 
     saveMockUser({ username, password });
     return { 
       success: true, 
-      message: 'SIMULATION: IDENTITY_STORED', 
+      message: 'Offline Mode: Account saved', 
       status: 201 
     };
   }
@@ -106,7 +106,7 @@ export const resetPassword = async (username) => {
   await new Promise(resolve => setTimeout(resolve, 1000));
   return {
     success: true,
-    message: `RECOVERY_SIGNAL: ${username.toUpperCase()}`,
+    message: 'Reset link sent',
     status: 200
   };
 };
